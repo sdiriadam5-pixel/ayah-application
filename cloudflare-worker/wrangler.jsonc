@@ -5,12 +5,12 @@
   "compatibility_date": "2026-10-28",
   "vars": {
     "APP_ORIGIN": "https://sdiriadam5-pixel.github.io",
-    "VAPID_SUBJECT": "mailto:replace-with-your-email@example.com"
+    "VAPID_SUBJECT": "mailto:sdiriadam5@gmail.com"
   },
   "kv_namespaces": [
     {
       "binding": "AYAH_KV",
-      "id": "CREATE_KV_NAMESPACE_AND_PASTE_ID_HERE"
+      "id": "68199970e83e4105b799b46b0600d530"
     }
   ],
   "triggers": {
