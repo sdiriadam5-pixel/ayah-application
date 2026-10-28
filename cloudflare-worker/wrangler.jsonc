@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ayah-push-free",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-28",
+  "vars": {
+    "APP_ORIGIN": "https://sdiriadam5-pixel.github.io",
+    "VAPID_SUBJECT": "mailto:replace-with-your-email@example.com"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "AYAH_KV",
+      "id": "CREATE_KV_NAMESPACE_AND_PASTE_ID_HERE"
+    }
+  ],
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
+  "observability": { "enabled": true }
+}

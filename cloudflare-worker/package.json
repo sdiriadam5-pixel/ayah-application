@@ -1,0 +1,16 @@
+{
+  "name": "ayah-cloudflare-push",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@mmmike/web-push": "1.5.0"
+  },
+  "devDependencies": {
+    "wrangler": "4.155.0"
+  },
+  "engines": { "node": ">=22.12.0" }
+}
