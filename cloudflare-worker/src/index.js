@@ -69,12 +69,34 @@ function localTime(date, timezone) {
   }).formatToParts(date).filter(part => part.type !== 'literal').map(part => [part.type, part.value]));
   return { date: `${parts.year}-${parts.month}-${parts.day}`, hour: Number(parts.hour), minute: Number(parts.minute) };
 }
+const HOURLY_DHIKR = [
+  { text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', source: 'صحيح البخاري 6405' },
+  { text: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', source: 'صحيح البخاري 6384' },
+  { text: 'سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَلَا إِلَهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ', source: 'صحيح مسلم 2137' },
+  { text: 'اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ، وَشُكْرِكَ، وَحُسْنِ عِبَادَتِكَ', source: 'سنن أبي داود 1522' },
+  { text: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ', source: 'صحيح البخاري 6307' },
+  { text: 'سُبْحَانَ اللَّهِ الْعَظِيمِ، سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', source: 'صحيح البخاري 6406' },
+  { text: 'رَبَّنَا وَلَكَ الْحَمْدُ، حَمْدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ', source: 'صحيح البخاري 799' },
+  { text: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', source: 'صحيح البخاري 3293' },
+  { text: 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ', source: 'صحيح مسلم 408' },
+  { text: 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ', source: 'القرآن 2:201' },
+  { text: 'لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ', source: 'القرآن 21:87' },
+  { text: 'حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ', source: 'القرآن 3:173' }
+];
+function dayOfYear(dateString) {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return Math.floor((Date.UTC(year, month - 1, day) - Date.UTC(year, 0, 1)) / 86400000);
+}
 function dueJobs(prefs, local) {
   const withinOneMinute = scheduled => { const [h, m] = scheduled.split(':').map(Number); const delta = local.hour * 60 + local.minute - (h * 60 + m); return delta >= 0 && delta <= 1; };
   const jobs = [];
   if (prefs.morningEnabled && withinOneMinute(prefs.morningTime)) jobs.push({ key: `morning:${local.date}`, title: 'أذكار الصباح', body: 'اللهم بك أصبحنا، وبك أمسينا، وبك نحيا، وبك نموت، وإليك المصير. (جامع الترمذي 3391)' });
   if (prefs.nawmEnabled && local.hour === 23 && local.minute <= 1) jobs.push({ key: `nawm:${local.date}`, title: 'أذكار النوم', body: 'باسمك اللهم أموت وأحيا. (صحيح البخاري 6324)' });
-  if (prefs.dhikrEnabled && local.hour >= 8 && local.hour <= 19 && local.minute <= 1) jobs.push({ key: `dhikr:${local.date}:${local.hour}`, title: 'ذِكر الساعة', body: 'سبحان الله، والحمد لله، ولا إله إلا الله، والله أكبر' });
+  if (prefs.dhikrEnabled && local.hour >= 8 && local.hour <= 19 && local.minute <= 1) {
+    const index = (dayOfYear(local.date) + local.hour - 8) % HOURLY_DHIKR.length;
+    const dhikr = HOURLY_DHIKR[index];
+    jobs.push({ key: `dhikr:${local.date}:${local.hour}`, title: 'ذِكر الساعة', body: `${dhikr.text} — ${dhikr.source}` });
+  }
   if (prefs.dailyEnabled && withinOneMinute(prefs.dailyTime)) jobs.push({ key: `wird:${local.date}`, title: prefs.language === 'ar' ? 'موعد الورد اليومي' : 'Ayah · Wird quotidien', body: prefs.language === 'ar' ? 'حان وقت وِردك اليومي من القرآن.' : 'C’est l’heure de ton wird quotidien. Ouvre Ayah pour reprendre ta lecture.' });
   return jobs;
 }
